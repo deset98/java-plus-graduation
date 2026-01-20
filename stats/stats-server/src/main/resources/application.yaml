@@ -1,0 +1,21 @@
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:6432/stats
+    username: stats
+    password: stats
+  jpa:
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+logging:
+  level:
+    ru.practicum.ewm: DEBUG
