@@ -15,7 +15,6 @@
         <module>stats</module>
         <module>core</module>
         <module>infra</module>
-        <module>infra/discovery-server</module>
     </modules>
 
     <groupId>ru.practicum</groupId>
