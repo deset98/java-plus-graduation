@@ -1,21 +1,14 @@
-server:
-  port: 9090
-
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:6432/stats
-    username: stats
-    password: stats
-  jpa:
-    properties:
-      hibernate:
-        default_schema: public
-        format_sql: true
-    hibernate:
-      ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-
-logging:
-  level:
-    ru.practicum.ewm: DEBUG
+  application:
+    name: stats-server
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
+      discovery:
+        enabled: true
+        serviceId: config-server

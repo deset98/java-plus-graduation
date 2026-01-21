@@ -24,7 +24,8 @@ public class StatsClient {
 
     private final String serverUrl;
 
-    public StatsClient(RestTemplate template, @Value("${explore-with-me-server.url}") String serverUrl) {
+    public StatsClient(RestTemplate template,
+                       @Value("${explore-with-me-server.url:http://localhost:9090}") String serverUrl) {
         this.restTemplate = template;
         this.serverUrl = serverUrl;
 
@@ -56,31 +57,31 @@ public class StatsClient {
         log.debug("Метод getStats(): start={}, end={}, uris={}, unique={}",
                 params.getStart(), params.getEnd(), params.getUris(), params.isUnique());
 
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
-                    .queryParam("start", params.getStart())
-                    .queryParam("end", params.getEnd());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                .queryParam("start", params.getStart())
+                .queryParam("end", params.getEnd());
 
-            if (params.getUris() != null && !params.getUris().isEmpty()) {
-                builder.queryParam("uris", String.join(",", params.getUris()));
-            }
+        if (params.getUris() != null && !params.getUris().isEmpty()) {
+            builder.queryParam("uris", String.join(",", params.getUris()));
+        }
 
-            builder.queryParam("unique", params.isUnique());
+        builder.queryParam("unique", params.isUnique());
 
-            URI url = builder.build().toUri();
+        URI url = builder.build().toUri();
 
-            HttpEntity<Void> requestEntity = new HttpEntity<>(defaultHeaders());
+        HttpEntity<Void> requestEntity = new HttpEntity<>(defaultHeaders());
 
-            ResponseEntity<List<StatsDto>> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    requestEntity,
-                    new ParameterizedTypeReference<List<StatsDto>>() {
-                    }
-            );
+        ResponseEntity<List<StatsDto>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                new ParameterizedTypeReference<List<StatsDto>>() {
+                }
+        );
 
-            log.info("Получена статистика: {}", response.getBody());
+        log.info("Получена статистика: {}", response.getBody());
 
-            return response.getBody();
+        return response.getBody();
     }
 
     private HttpHeaders defaultHeaders() {
