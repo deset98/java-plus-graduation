@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.dto.Location;
-import ru.practicum.ewm.user.model.User;
 
 import java.time.Instant;
 
@@ -53,12 +52,8 @@ public class Event {
             nullable = false)
     private Instant eventDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_events_users"))
-    @ToString.Exclude
-    private User initiator;
+    @Column(name = "user_id", nullable = false)
+    private Long initiatorId;
 
     @Embedded
     private Location location;

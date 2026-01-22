@@ -4,13 +4,12 @@ import org.mapstruct.*;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.user.mapper.UserMapper;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class, UserMapper.class})
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
 public interface EventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -27,14 +26,15 @@ public interface EventMapper {
             expression = "java(newEventDto.getParticipantLimit() != null ? newEventDto.getParticipantLimit() : 0)")
     @Mapping(target = "requestModeration",
             expression = "java(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : true)")
-
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "views", ignore = true)
     Event toEntity(NewEventDto newEventDto);
 
+    @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "eventDate", expression = "java(toLocalDateTimeForMap(event.getEventDate()))")
     EventShortDto toShortDto(Event event);
 
+    @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "createdOn", expression = "java(toLocalDateTimeForMap(event.getCreatedOn()))")
     @Mapping(target = "eventDate", expression = "java(toLocalDateTimeForMap(event.getEventDate()))")
     @Mapping(target = "publishedOn", expression = "java(toLocalDateTimeForMap(event.getPublishedOn()))")
@@ -47,6 +47,7 @@ public interface EventMapper {
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "eventDate",
             expression = "java(toInstantForUpdate(updEventUserRequest.getEventDate(), event.getEventDate()))")
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "state", ignore = true)
