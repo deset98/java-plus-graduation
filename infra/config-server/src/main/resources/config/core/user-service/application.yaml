@@ -1,9 +1,9 @@
 spring:
   application:
-    name: main-service
+    name: user-service
 
   datasource:
-    url: jdbc:postgresql://localhost:4432/main-db
+    url: jdbc:postgresql://localhost:2232/user-db
     username: postgres
     password: postgres
 
@@ -24,9 +24,6 @@ spring:
 logging:
   level:
     ru.practicum.ewm: DEBUG
-
-explore-with-me-server:
-  url: http://localhost:9090
 
 eureka:
   instance:

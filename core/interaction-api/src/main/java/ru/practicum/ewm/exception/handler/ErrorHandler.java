@@ -6,12 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.ewm.exception.*;
+import ru.practicum.ewm.exception.ApiError;
+import ru.practicum.ewm.exception.BadRequestException;
+import ru.practicum.ewm.exception.ConflictException;
+import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.dto.ErrorResponse;
 
 import java.time.LocalDateTime;
 
-@Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
@@ -24,8 +26,6 @@ public class ErrorHandler {
             case ConflictException ignored -> HttpStatus.CONFLICT;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
-
-        log.warn("{}: {}", status, ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
                 LocalDateTime.now(),

@@ -1,4 +1,4 @@
-package ru.practicum.ewm.user.service;
+package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.user.dto.NewUserRequest;
-import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.mapper.UserMapper;
-import ru.practicum.ewm.user.model.User;
-import ru.practicum.ewm.user.repository.UserRepository;
+import ru.practicum.ewm.dto.NewUserRequest;
+import ru.practicum.ewm.dto.UserDto;
+import ru.practicum.ewm.mapper.UserMapper;
+import ru.practicum.ewm.model.User;
+import ru.practicum.ewm.repository.UserRepository;
 
 import java.util.List;
 
