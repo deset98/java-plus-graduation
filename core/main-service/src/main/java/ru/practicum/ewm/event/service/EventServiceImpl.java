@@ -16,6 +16,7 @@ import ru.practicum.ewm.StatsDto;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.client.StatsClient;
+import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
@@ -27,10 +28,7 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 import ru.practicum.ewm.request.mapper.RequestMapper;
 import ru.practicum.ewm.request.model.Request;
-import ru.practicum.ewm.request.model.RequestStatus;
 import ru.practicum.ewm.request.repository.RequestRepository;
-import ru.practicum.ewm.user.model.User;
-import ru.practicum.ewm.user.repository.UserRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -46,7 +44,7 @@ import static ru.practicum.ewm.event.model.EventState.CANCELED;
 @Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
 
-    private final UserRepository userRepository;
+    private final UserClient userClient;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final CategoryRepository categoryRepository;
@@ -63,12 +61,12 @@ public class EventServiceImpl implements EventService {
         log.debug("Метод create(); userId={}, newDto={}", userId, newDto);
 
         this.checkStartDate(newDto.getEventDate());
-        User user = this.findUserBy(userId);
+        userClient.validateUserExists(userId);
         Category category = this.findCategoryBy(newDto.getCategory());
 
         Event event = eventMapper.toEntity(newDto);
         event.setLocation(newDto.getLocation());
-        event.setInitiator(user);
+        event.setInitiatorId(userId);
         event.setCategory(category);
         event = eventRepository.save(event);
 
@@ -274,7 +272,7 @@ public class EventServiceImpl implements EventService {
         List<BooleanExpression> conditions = new ArrayList<>();
 
         if (params.getUsers() != null && !params.getUsers().isEmpty()) {
-            conditions.add(event.initiator.id.in(params.getUsers()));
+            conditions.add(event.initiatorId.in(params.getUsers()));
         }
 
         if (params.getCategories() != null && !params.getCategories().isEmpty()) {
@@ -395,12 +393,6 @@ public class EventServiceImpl implements EventService {
                 .peek(r -> r.setStatus(status))
                 .map(requestMapper::toDto)
                 .toList();
-    }
-
-    private User findUserBy(Long userId) {
-        log.debug("Поиск User id={} в репозитории", userId);
-
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User id={} не найден", userId));
     }
 
     private Category findCategoryBy(Long categoryId) {

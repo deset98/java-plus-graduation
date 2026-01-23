@@ -12,4 +12,6 @@ public interface UserService {
     UserDto add(NewUserRequest newDto);
 
     void delete(Long userId);
+
+    void validateUserExists(Long userId);
 }

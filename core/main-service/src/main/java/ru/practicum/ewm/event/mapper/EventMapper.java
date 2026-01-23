@@ -19,7 +19,7 @@ public interface EventMapper {
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "eventDate", expression = "java(toInstantForMap(newEventDto.getEventDate()))")
-    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "paid", expression = "java(newEventDto.getPaid() != null ? newEventDto.getPaid() : false)")
     @Mapping(target = "participantLimit",
@@ -42,12 +42,11 @@ public interface EventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "eventDate",
             expression = "java(toInstantForUpdate(updEventUserRequest.getEventDate(), event.getEventDate()))")
-    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "state", ignore = true)
@@ -57,7 +56,7 @@ public interface EventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "location", ignore = true)
     @Mapping(target = "eventDate",

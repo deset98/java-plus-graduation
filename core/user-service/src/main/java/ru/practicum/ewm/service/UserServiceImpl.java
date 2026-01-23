@@ -76,4 +76,11 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User userId={} не найден", userId);
         }
     }
+
+    @Override
+    public void validateUserExists(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("User не найден, userId={}", userId);
+        }
+    }
 }
