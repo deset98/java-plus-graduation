@@ -1,9 +1,9 @@
 spring:
   application:
-    name: main-service
+    name: event-service
 
   datasource:
-    url: jdbc:postgresql://localhost:4432/main-db
+    url: jdbc:postgresql://localhost:4432/event-db
     username: postgres
     password: postgres
 

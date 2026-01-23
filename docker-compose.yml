@@ -23,30 +23,32 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
-  ewm-service:
-    build: main-service
-    image: main-service
-    container_name: main-service
+#----  ----  ----  ----  ---- ----  ----  ----  ----  ----
+
+  event-service:
+    build: event-service
+    image: event-service
+    container_name: event-service
     ports:
       - "8081:8081"
     depends_on:
-      main-db:
+      event-db:
         condition: service_healthy
       stats-server:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://event-db:5432/event
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - STATS_SERVER_URL=http://stats-server:9090
 
-  main-db:
+  event-db:
     image: postgres:16.1
-    container_name: main-db
+    container_name: event-db
     ports:
       - "4432:5432"
     environment:
-      - POSTGRES_DB=main-db
+      - POSTGRES_DB=event-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 

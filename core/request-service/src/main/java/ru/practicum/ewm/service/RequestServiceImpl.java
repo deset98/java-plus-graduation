@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.client.EventClient;
 import ru.practicum.ewm.client.UserClient;
+import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.enums.request.RequestStatus;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
@@ -25,7 +27,7 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService {
 
     private final UserClient userClient;
-    private final EventRepository eventRepository;
+    private final EventClient eventClient;
     private final RequestRepository requestRepository;
 
     private final RequestMapper requestMapper;
@@ -36,9 +38,9 @@ public class RequestServiceImpl implements RequestService {
         log.debug("Метод createRequest(); userId={}, eventId={}", userId, eventId);
 
         userClient.validateUserExists(userId);
-        Event event = this.findEventBy(eventId);
+        EventFullDto eventDto = eventClient.getEventBy(eventId);
 
-        if (eventRepository.existsByIdAndInitiatorId(eventId, userId)) {
+        if (eventClient.existsByIdAndInitiatorId(eventId, userId)) {
             throw new ConflictException("Нельзя участвовать в собственном событии");
         }
 
@@ -62,7 +64,7 @@ public class RequestServiceImpl implements RequestService {
 
         if (status == RequestStatus.CONFIRMED) {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventRepository.save(event);
+            eventClient.save(event);
         }
 
         Request request = Request.builder()
@@ -109,7 +111,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private Event findEventBy(Long eventId) {
-        return eventRepository.findById(eventId)
+        return eventClient.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event id={} не найден", eventId));
     }
 }

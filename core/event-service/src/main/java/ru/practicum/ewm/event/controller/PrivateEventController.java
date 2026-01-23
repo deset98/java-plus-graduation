@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.event.service.EventService;
-import ru.practicum.ewm.request.dto.ParticipationRequestDto;
 
 import java.net.URI;
 import java.util.List;
