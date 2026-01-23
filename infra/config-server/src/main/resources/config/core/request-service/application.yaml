@@ -1,9 +1,9 @@
 spring:
   application:
-    name: user-service
+    name: request-service
 
   datasource:
-    url: jdbc:postgresql://localhost:9132/user-db
+    url: jdbc:postgresql://localhost:9232/request-db
     username: postgres
     password: postgres
 

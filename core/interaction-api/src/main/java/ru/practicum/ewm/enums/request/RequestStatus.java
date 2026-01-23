@@ -1,4 +1,4 @@
-package ru.practicum.ewm.request.model;
+package ru.practicum.ewm.enums.request;
 
 public enum RequestStatus {
     CONFIRMED,

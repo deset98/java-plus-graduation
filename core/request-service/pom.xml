@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>user-service</artifactId>
+    <artifactId>request-service</artifactId>
 
     <properties>
         <java.version>21</java.version>
@@ -141,4 +141,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

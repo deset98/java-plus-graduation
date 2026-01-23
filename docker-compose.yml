@@ -28,7 +28,7 @@ services:
     image: main-service
     container_name: main-service
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       main-db:
         condition: service_healthy
@@ -57,7 +57,7 @@ services:
     image: user-service
     container_name: user-service
     ports:
-      - "8090:8090"
+      - "8091:8091"
     depends_on:
       user-db:
         condition: service_healthy
@@ -70,8 +70,34 @@ services:
     image: postgres:16.1
     container_name: user-db
     ports:
-      - "2232:5432"
+      - "9132:5432"
     environment:
       - POSTGRES_DB=user-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  #----  ----  ----  ----  ---- ----  ----  ----  ----  ----
+
+  request-service:
+    build: request-service
+    image: request-service
+    container_name: request-service
+    ports:
+      - "8092:8092"
+    depends_on:
+      request-db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://request-db:5432/request-db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+
+  request-db:
+    image: postgres:16.1
+    container_name: request-db
+    ports:
+      - "9232:5432"
+    environment:
+      - POSTGRES_DB=request-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

@@ -1,21 +1,20 @@
-package ru.practicum.ewm.request.service;
+package ru.practicum.ewm.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.client.UserClient;
+import ru.practicum.ewm.enums.request.RequestStatus;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.request.dto.ParticipationRequestDto;
-import ru.practicum.ewm.request.mapper.RequestMapper;
-import ru.practicum.ewm.request.model.Request;
-import ru.practicum.ewm.request.model.RequestStatus;
-import ru.practicum.ewm.request.repository.RequestRepository;
-import ru.practicum.ewm.user.model.User;
-import ru.practicum.ewm.user.repository.UserRepository;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.mapper.RequestMapper;
+import ru.practicum.ewm.model.Request;
+import ru.practicum.ewm.repository.RequestRepository;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RequestServiceImpl implements RequestService {
 
-    private final UserRepository userRepository;
+    private final UserClient userClient;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
 
@@ -36,7 +35,7 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto create(Long userId, Long eventId) {
         log.debug("Метод createRequest(); userId={}, eventId={}", userId, eventId);
 
-        User user = this.findUserBy(userId);
+        userClient.validateUserExists(userId);
         Event event = this.findEventBy(eventId);
 
         if (eventRepository.existsByIdAndInitiatorId(eventId, userId)) {
@@ -92,7 +91,7 @@ public class RequestServiceImpl implements RequestService {
     public ParticipationRequestDto cancel(Long userId, Long requestId) {
         log.debug("Метод cancel(); userId={}, requestId={}", userId, requestId);
 
-        this.findUserBy(userId);
+        userClient.validateUserExists(userId);
         Request request = this.findRequestBy(requestId);
         request.setStatus(RequestStatus.CANCELED);
 
@@ -102,11 +101,6 @@ public class RequestServiceImpl implements RequestService {
         request = requestRepository.save(request);
 
         return requestMapper.toDto(request);
-    }
-
-
-    private User findUserBy(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User id={} не найден", userId));
     }
 
     private Request findRequestBy(Long requestId) {

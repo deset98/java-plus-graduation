@@ -1,8 +1,8 @@
-package ru.practicum.ewm.request.repository;
+package ru.practicum.ewm.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.practicum.ewm.request.model.Request;
+import ru.practicum.ewm.model.Request;
 
 import java.util.List;
 import java.util.Set;
