@@ -1,4 +1,4 @@
-package ru.practicum.ewm.category.dto;
+package ru.practicum.ewm.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

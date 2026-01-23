@@ -1,3 +1,3 @@
-package ru.practicum.ewm.comment.model;
+package ru.practicum.ewm.enums.comment;
 
 public enum CommentState { PUBLIC, HIDE }

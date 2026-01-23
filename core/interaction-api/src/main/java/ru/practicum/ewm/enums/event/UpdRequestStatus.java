@@ -1,3 +1,3 @@
-package ru.practicum.ewm.event.dto;
+package ru.practicum.ewm.enums.event;
 
 public enum UpdRequestStatus { CONFIRMED, REJECTED }

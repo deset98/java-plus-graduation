@@ -1,4 +1,4 @@
-package ru.practicum.ewm.comment.dto;
+package ru.practicum.ewm.dto.comment;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

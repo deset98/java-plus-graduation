@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.comment.dto.CommentFullDto;
+import ru.practicum.ewm.dto.comment.CommentFullDto;
 import ru.practicum.ewm.comment.service.CommentService;
 
 @Slf4j

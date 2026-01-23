@@ -2,6 +2,7 @@ package ru.practicum.ewm.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.ewm.enums.comment.CommentState;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.model.User;
 

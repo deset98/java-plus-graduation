@@ -17,10 +17,11 @@ import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.client.UserClient;
-import ru.practicum.ewm.event.dto.*;
+import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.enums.event.UpdRequestStatus;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventState;
+import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.event.model.QEvent;
 import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.ConflictException;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.ZoneOffset.UTC;
-import static ru.practicum.ewm.event.model.EventState.CANCELED;
+import static ru.practicum.ewm.enums.event.EventState.CANCELED;
 
 @Slf4j
 @Service
