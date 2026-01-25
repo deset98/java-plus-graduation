@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.enums.event.EventState;
-import ru.practicum.ewm.dto.event.Location;
 
 import java.time.Instant;
 

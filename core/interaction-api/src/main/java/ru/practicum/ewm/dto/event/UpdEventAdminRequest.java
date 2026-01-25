@@ -29,7 +29,7 @@ public class UpdEventAdminRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private Location location;
+    private LocationDto locationDto;
 
     private Boolean paid;
 

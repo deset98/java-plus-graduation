@@ -6,11 +6,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.dto.user.UserFullDto;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.mapper.UserMapper;
 import ru.practicum.ewm.model.User;
 import ru.practicum.ewm.repository.UserRepository;
@@ -26,9 +26,11 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
 
+    // Admin API:
+
     @Override
     @Transactional
-    public UserDto add(NewUserRequest newDto) {
+    public UserFullDto add(NewUserRequest newDto) {
         log.debug("Метод add(); userInputDto={}", newDto);
 
         if (userRepository.existsByEmail(newDto.getEmail())) {
@@ -47,7 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllBy(List<Long> ids, Integer from, Integer size) {
+    public List<UserFullDto> findAllBy(List<Long> ids, Integer from, Integer size) {
         log.debug("Метод findAll(); ids={}, from={}, size={}", ids, from, size);
 
         int page = from / size;
@@ -77,10 +79,19 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // Internal API:
+
     @Override
     public void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User не найден, userId={}", userId);
         }
+    }
+
+    @Override
+    public UserFullDto findById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User не найден, userId={}", userId));
+        return userMapper.toFullDto(user);
     }
 }

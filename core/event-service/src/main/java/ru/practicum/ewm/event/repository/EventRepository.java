@@ -3,10 +3,12 @@ package ru.practicum.ewm.event.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.enums.event.EventState;
+import ru.practicum.ewm.event.model.Event;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,4 +28,8 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
     boolean existsByCategoryId(Long categoryId);
 
     boolean existsByIdAndInitiatorId(Long eventId, Long userId);
+
+    @Modifying
+    @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests + 1 WHERE e.id = :id")
+    void incrementConfirmedRequests(Long eventId);
 }

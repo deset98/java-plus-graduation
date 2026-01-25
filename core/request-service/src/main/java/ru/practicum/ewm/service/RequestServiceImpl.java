@@ -7,18 +7,17 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.client.EventClient;
 import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.dto.event.EventFullDto;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.enums.request.RequestStatus;
-import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.event.model.EventState;
-import ru.practicum.ewm.event.repository.EventRepository;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.repository.RequestRepository;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -48,28 +47,29 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictException("Request уже создан ранее");
         }
 
-        if (!event.getState().equals(EventState.PUBLISHED)) {
+        if (!eventDto.getState().equals(EventState.PUBLISHED)) {
             throw new ConflictException("Нельзя участвовать в неопубликованном событии");
         }
 
-        long limit = event.getParticipantLimit();
-        long confirm = event.getConfirmedRequests();
+        long limit = eventDto.getParticipantLimit();
+        long confirm = eventDto.getConfirmedRequests();
 
         if (limit > 0 && confirm >= limit) {
             throw new ConflictException("Достигнут лимит запросов на участие в событии");
         }
 
         RequestStatus status =
-                (!event.getRequestModeration() || limit == 0) ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
+                (!eventDto.getRequestModeration() || limit == 0) ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
 
         if (status == RequestStatus.CONFIRMED) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventClient.save(event);
+//            eventDto.setConfirmedRequests(eventDto.getConfirmedRequests() + 1);
+//            eventClient.updateEvent(eventDto.getId(), eventDto);
+            eventClient.incrementConfirmedRequests(eventDto.getId());
         }
 
         Request request = Request.builder()
-                .requester(user)
-                .event(event)
+                .eventId(eventId)
+                .requesterId(userId)
                 .status(status)
                 .build();
         request = requestRepository.save(request);
@@ -97,7 +97,7 @@ public class RequestServiceImpl implements RequestService {
         Request request = this.findRequestBy(requestId);
         request.setStatus(RequestStatus.CANCELED);
 
-        if (!request.getRequester().getId().equals(userId)) {
+        if (!request.getRequesterId().equals(userId)) {
             throw new ConflictException("User id={} не является автором этого запроса", userId);
         }
         request = requestRepository.save(request);
@@ -105,13 +105,31 @@ public class RequestServiceImpl implements RequestService {
         return requestMapper.toDto(request);
     }
 
+    // Internal API:
+
+
+    @Override
+    public List<ParticipationRequestDto> findAllByEventId(Long eventId) {
+        log.debug("Метод findAllByEventId(); eventId={}", eventId);
+
+        return requestRepository.findAllByEventId(eventId).stream()
+                .map(requestMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<ParticipationRequestDto> findAllByIdIn(Set<Long> requestIds) {
+        log.debug("Метод findAllByIdIn(); requestIds={}", requestIds);
+
+
+        return requestRepository.findAllByIdIn(requestIds).stream()
+                .map(requestMapper::toDto)
+                .toList();
+    }
+
+
     private Request findRequestBy(Long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request id={} не найден", requestId));
-    }
-
-    private Event findEventBy(Long eventId) {
-        return eventClient.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event id={} не найден", eventId));
     }
 }

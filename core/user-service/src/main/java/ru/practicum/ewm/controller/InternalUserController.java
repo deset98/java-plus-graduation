@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.ewm.dto.user.UserDto;
-import ru.practicum.ewm.dto.user.UserShortDto;
+import ru.practicum.ewm.dto.user.UserFullDto;
 import ru.practicum.ewm.service.UserService;
 
 import java.util.List;
@@ -33,11 +32,20 @@ public class InternalUserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getUsers(@RequestParam List<Long> ids,
-                                                  @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                  @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+    public ResponseEntity<UserFullDto> getUserBy(@RequestParam @Positive Long userId) {
+        log.debug("IntUserController, метод getUsers: userId={}", userId);
+
+        UserFullDto result = userService.findById(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserFullDto>> getUsersBy(@RequestParam List<Long> ids,
+                                                        @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                        @RequestParam(defaultValue = "10") @Min(1) Integer size) {
         log.debug("InternalUserController, метод getUsers: ids={}, from={}, size={}", ids, from, size);
 
-        return ResponseEntity.ok(userService.findAllBy(ids, from, size));
+        List<UserFullDto> result = userService.findAllBy(ids, from, size);
+        return ResponseEntity.ok(result);
     }
 }

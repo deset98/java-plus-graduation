@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.category.dto.CategoryDto;
+import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.dto.user.UserShortDto;
 
@@ -35,7 +35,7 @@ public class EventFullDto {
 
     private UserShortDto initiator;
 
-    private Location location;
+    private LocationDto locationDto;
 
     private Boolean paid;
 

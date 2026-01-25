@@ -1,17 +1,23 @@
 package ru.practicum.ewm.service;
 
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import ru.practicum.ewm.dto.user.UserDto;
+import ru.practicum.ewm.dto.user.UserFullDto;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserDto> findAllBy(List<Long> ids, Integer from, Integer size);
+    // Admin API:
 
-    UserDto add(NewUserRequest newDto);
+    List<UserFullDto> findAllBy(List<Long> ids, Integer from, Integer size);
+
+    UserFullDto add(NewUserRequest newDto);
 
     void delete(Long userId);
 
     void validateUserExists(Long userId);
+
+    // Internal API:
+
+    UserFullDto findById(Long userId);
 }

@@ -12,6 +12,8 @@ import java.time.ZoneOffset;
 @Mapper(componentModel = "spring")
 public interface RequestMapper {
 
+    @Mapping(target = "event", source = "eventId")
+    @Mapping(target = "requester", source = "requesterId")
     @Mapping(target = "created", expression = "java(toLocalDateTime(request.getCreated()))")
     ParticipationRequestDto toDto(Request request);
 

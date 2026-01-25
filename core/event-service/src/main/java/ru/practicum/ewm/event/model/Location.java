@@ -1,4 +1,4 @@
-package ru.practicum.ewm.dto.event;
+package ru.practicum.ewm.event.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

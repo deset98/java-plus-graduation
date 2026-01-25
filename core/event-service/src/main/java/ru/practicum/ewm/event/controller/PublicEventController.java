@@ -26,7 +26,7 @@ public class PublicEventController {
                                                         HttpServletRequest request) {
         log.debug("Метод publicSearchOne(); eventId={}", eventId);
 
-        EventFullDto event = eventService.getPublicBy(eventId, request);
+        EventFullDto event = eventService.getEventBy(eventId, request);
         return ResponseEntity.ok(event);
     }
 
@@ -35,7 +35,7 @@ public class PublicEventController {
                                                                HttpServletRequest request) {
         log.debug("Метод publicSearchMany(); {}", params);
 
-        List<EventFullDto> events = eventService.getPublicBy(params, request);
+        List<EventFullDto> events = eventService.getListOfEventsBy(params, request);
         return ResponseEntity.ok(events);
     }
 }

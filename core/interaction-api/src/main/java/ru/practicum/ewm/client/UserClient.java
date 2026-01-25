@@ -3,6 +3,7 @@ package ru.practicum.ewm.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.ewm.dto.user.UserFullDto;
 import ru.practicum.ewm.dto.user.UserShortDto;
 
 import java.util.List;
@@ -14,5 +15,8 @@ public interface UserClient {
     void validateUserExists(@RequestParam Long userId);
 
     @GetMapping
-    List<UserShortDto> getUsers(@RequestParam List<Long> ids);
+    UserFullDto getUserBy(@RequestParam Long userId);
+
+    @GetMapping
+    List<UserShortDto> getUsersBy(@RequestParam List<Long> ids);
 }

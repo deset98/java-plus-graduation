@@ -21,10 +21,10 @@ public class Request {
     private Long id;
 
     @Column(name = "event_id", nullable = false)
-    private Long event;
+    private Long eventId;
 
     @Column(name = "user_id", nullable = false)
-    private Long requester;
+    private Long requesterId;
 
     @Column
     @Builder.Default

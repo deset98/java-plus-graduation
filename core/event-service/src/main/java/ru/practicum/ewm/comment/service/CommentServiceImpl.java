@@ -3,18 +3,19 @@ package ru.practicum.ewm.comment.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.client.UserClient;
+import ru.practicum.ewm.comment.mapper.CommentMapper;
+import ru.practicum.ewm.comment.model.Comment;
+import ru.practicum.ewm.comment.repository.CommentRepository;
 import ru.practicum.ewm.dto.comment.CommentFullDto;
 import ru.practicum.ewm.dto.comment.CommentPublicDto;
 import ru.practicum.ewm.dto.comment.NewCommentDto;
 import ru.practicum.ewm.dto.comment.UpdCommentDto;
-import ru.practicum.ewm.comment.mapper.CommentMapper;
-import ru.practicum.ewm.comment.model.Comment;
 import ru.practicum.ewm.enums.comment.CommentState;
-import ru.practicum.ewm.comment.repository.CommentRepository;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.event.service.EventServiceImpl;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
-import ru.practicum.ewm.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -23,13 +24,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private final UserRepository userRepository;
+    private final UserClient userClient;
     private final EventRepository eventRepository;
     private final CommentRepository commentRepository;
 
     private final CommentMapper commentMapper;
+    private final EventServiceImpl eventServiceImpl;
 
     // Admin API:
+
     @Override
     public CommentFullDto hide(Long eventId, Long commentId, boolean published) {
         log.info("Метод hide(); eventId={}; commentId={}", eventId, commentId);
@@ -53,19 +56,26 @@ public class CommentServiceImpl implements CommentService {
 
 
     // Public API:
+
     @Override
     public List<CommentPublicDto> getAllBy(Long eventId) {
         log.info("Метод getAllBy(); eventId = {}", eventId);
 
         List<Comment> comments = commentRepository.findByEventId(eventId);
+        String eventTitle = eventServiceImpl.getEventBy(eventId).getTitle();
 
         return comments.stream()
-                .map(commentMapper::toPublicDto)
+                .map(comment -> {
+                    CommentPublicDto dto = commentMapper.toPublicDto(comment);
+                    dto.setAuthorName(userClient.getUserBy(comment.getAuthorId()).getName());
+                    dto.setEventTitle(eventTitle);
+                    return dto;
+                })
                 .toList();
     }
 
-
     // Private API:
+
     @Override
     public CommentFullDto add(NewCommentDto dto, Long eventId, Long userId) {
         log.info("Метод add(); eventId={}, userId={}; dto={}", eventId, userId, dto);
@@ -76,8 +86,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         Comment comment = commentMapper.toEntity(dto);
-        comment.setAuthor(userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User id={}, не найден", userId)));
+        comment.setAuthorId(userId);
         comment.setEvent(eventRepository
                 .findById(eventId).orElseThrow(() -> new NotFoundException("Event id={}, не найден", eventId)));
         comment = commentRepository.save(comment);
@@ -122,10 +131,10 @@ public class CommentServiceImpl implements CommentService {
     private void checkExistsUserAndComment(Long userId, Long commentId) {
         log.info("Метод checkExistsUserAndComment(); userId={}, commentId={}", userId, commentId);
 
+        userClient.validateUserExists(userId);
+
         if (!commentRepository.existsByIdAndAuthorId(commentId, userId)) {
-            if (!userRepository.existsById(userId)) {
-                throw new NotFoundException("User id={}, не существует", userId);
-            } else if (!commentRepository.existsById(commentId)) {
+            if (!commentRepository.existsById(commentId)) {
                 throw new NotFoundException("Comment id={}, не существует", commentId);
             } else {
                 throw new ConflictException("Пользователь не является автором комментария; " +
