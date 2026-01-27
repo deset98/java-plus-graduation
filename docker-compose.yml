@@ -1,5 +1,6 @@
 services:
   stats-server:
+    profiles: [app]
     build: stats/stats-server
     image: stats-server
     container_name: stats-server
@@ -14,6 +15,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
 
   stats-db:
+    profiles: [db]
     image: postgres:16.1
     container_name: stats-db
     ports:
@@ -22,84 +24,76 @@ services:
       - POSTGRES_DB=stats-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-#----  ----  ----  ----  ---- ----  ----  ----  ----  ----
+  #----  ----  ----  ----  ---- ----  ----  ----  ----  ----
 
   event-service:
+    profiles: [app]
     build: event-service
     image: event-service
     container_name: event-service
     ports:
       - "8081:8081"
     depends_on:
-      event-db:
+      main-db:
         condition: service_healthy
       stats-server:
-        condition: service_healthy
+        condition: service_started
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://event-db:5432/event
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=events_schema
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - STATS_SERVER_URL=http://stats-server:9090
 
-  event-db:
-    image: postgres:16.1
-    container_name: event-db
-    ports:
-      - "4432:5432"
-    environment:
-      - POSTGRES_DB=event-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-
-#----  ----  ----  ----  ---- ----  ----  ----  ----  ----
-
   user-service:
+    profiles: [app]
     build: user-service
     image: user-service
     container_name: user-service
     ports:
       - "8091:8091"
     depends_on:
-      user-db:
+      main-db:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/user-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=users_schema
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
 
-  user-db:
-    image: postgres:16.1
-    container_name: user-db
-    ports:
-      - "9132:5432"
-    environment:
-      - POSTGRES_DB=user-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-
-  #----  ----  ----  ----  ---- ----  ----  ----  ----  ----
-
   request-service:
+    profiles: [app]
     build: request-service
     image: request-service
     container_name: request-service
     ports:
       - "8092:8092"
     depends_on:
-      request-db:
+      main-db:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://request-db:5432/request-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=requests_schema
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
 
-  request-db:
+  main-db:
+    profiles: [db]
     image: postgres:16.1
-    container_name: request-db
+    container_name: main-db
     ports:
-      - "9232:5432"
+      - "5432:5432"
     environment:
-      - POSTGRES_DB=request-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_DB: main-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./infra/postgres:/docker-entrypoint-initdb.d

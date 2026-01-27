@@ -3,14 +3,13 @@ spring:
     name: request-service
 
   datasource:
-    url: jdbc:postgresql://localhost:9232/request-db
+    url: jdbc:postgresql://localhost:5432/main-db?currentSchema=requests_schema
     username: postgres
     password: postgres
 
   jpa:
     properties:
       hibernate:
-        default_schema: public
         format_sql: false
     hibernate:
       ddl-auto: create-drop

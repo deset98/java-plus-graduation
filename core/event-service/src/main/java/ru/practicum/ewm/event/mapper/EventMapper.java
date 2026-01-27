@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class, LocationMapper.class})
 public interface EventMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

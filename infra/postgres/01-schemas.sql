@@ -1,0 +1,3 @@
+CREATE SCHEMA IF NOT EXISTS events_schema;
+CREATE SCHEMA IF NOT EXISTS users_schema;
+CREATE SCHEMA IF NOT EXISTS requests_schema;
