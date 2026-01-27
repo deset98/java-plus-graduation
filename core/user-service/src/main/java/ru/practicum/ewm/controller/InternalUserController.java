@@ -21,7 +21,7 @@ public class InternalUserController {
 
     private final UserService userService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/check/{userId}")
     public ResponseEntity<Void> validateUserExists(@PathVariable @Positive Long userId) {
         log.debug("IntUserController, метод validateUserExists: userId={}", userId);
 
