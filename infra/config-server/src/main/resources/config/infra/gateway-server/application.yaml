@@ -4,7 +4,7 @@ spring:
 
   cloud:
     gateway:
-      discovery.locator.enabled: false
+      discovery.locator.enabled: true
       routes:
         - id: user-service
           uri: lb://user-service
@@ -19,6 +19,8 @@ management:
   endpoint:
     gateway:
       enable: true
+    health:
+      show-details: always
 
 logging:
   level:
