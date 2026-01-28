@@ -17,7 +17,16 @@ public interface RequestMapper {
     @Mapping(target = "created", expression = "java(toLocalDateTime(request.getCreated()))")
     ParticipationRequestDto toDto(Request request);
 
+    @Mapping(target = "eventId", source = "event")
+    @Mapping(target = "requesterId", source = "requester")
+    @Mapping(target = "created", expression = "java(toInstant(dto.getCreated()))")
+    Request toEntity(ParticipationRequestDto dto);
+
     default LocalDateTime toLocalDateTime(Instant instant) {
         return instant != null ? LocalDateTime.ofInstant(instant, ZoneOffset.UTC) : null;
+    }
+
+    default Instant toInstant(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.toInstant(ZoneOffset.UTC) : null;
     }
 }

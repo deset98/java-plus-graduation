@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.ewm.client.EventClient;
 import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.dto.event.EventFullDto;
@@ -105,8 +107,8 @@ public class RequestServiceImpl implements RequestService {
         return requestMapper.toDto(request);
     }
 
-    // Internal API:
 
+    // Internal API:
 
     @Override
     public List<ParticipationRequestDto> findAllByEventId(Long eventId) {
@@ -127,6 +129,13 @@ public class RequestServiceImpl implements RequestService {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public void updateRequestStatus(@PathVariable RequestStatus status, @RequestParam Set<Long> ids) {
+        if (ids != null && !ids.isEmpty()) {
+            requestRepository.updateStatus(status, ids);
+        }
+    }
 
     private Request findRequestBy(Long requestId) {
         return requestRepository.findById(requestId)

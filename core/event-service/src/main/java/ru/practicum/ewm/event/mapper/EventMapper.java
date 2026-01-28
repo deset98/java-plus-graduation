@@ -17,7 +17,7 @@ public interface EventMapper {
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
-    @Mapping(target = "location", ignore = true)
+    @Mapping(target = "locationEntity", source = "location")
     @Mapping(target = "eventDate", expression = "java(toInstantForMap(newEventDto.getEventDate()))")
     @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "publishedOn", ignore = true)
@@ -35,6 +35,7 @@ public interface EventMapper {
     EventShortDto toShortDto(Event event);
 
     @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "location", source = "locationEntity")
     @Mapping(target = "createdOn", expression = "java(toLocalDateTimeForMap(event.getCreatedOn()))")
     @Mapping(target = "eventDate", expression = "java(toLocalDateTimeForMap(event.getEventDate()))")
     @Mapping(target = "publishedOn", expression = "java(toLocalDateTimeForMap(event.getPublishedOn()))")
@@ -44,7 +45,7 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "location", ignore = true)
+    @Mapping(target = "locationEntity", source = "location")
     @Mapping(target = "eventDate",
             expression = "java(toInstantForUpdate(updEventUserRequest.getEventDate(), event.getEventDate()))")
     @Mapping(target = "publishedOn", ignore = true)
@@ -58,7 +59,7 @@ public interface EventMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "initiatorId", ignore = true)
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "location", ignore = true)
+    @Mapping(target = "locationEntity", source = "location")
     @Mapping(target = "eventDate",
             expression = "java(toInstantForUpdate(updEventAdminRequest.getEventDate(), event.getEventDate()))")
     @Mapping(target = "publishedOn", ignore = true)

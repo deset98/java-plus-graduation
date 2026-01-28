@@ -7,10 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.comment.service.CommentService;
 import ru.practicum.ewm.dto.comment.CommentFullDto;
 import ru.practicum.ewm.dto.comment.NewCommentDto;
 import ru.practicum.ewm.dto.comment.UpdCommentDto;
-import ru.practicum.ewm.comment.service.CommentService;
 
 import java.util.List;
 

@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class LocationEntity {
 
     @Column(name = "location_lat", nullable = false)
     private Float lat;

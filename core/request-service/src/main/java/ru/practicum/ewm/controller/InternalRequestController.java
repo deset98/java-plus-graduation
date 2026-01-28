@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.enums.request.RequestStatus;
 import ru.practicum.ewm.service.RequestService;
 
 import java.util.List;
@@ -29,5 +30,12 @@ public class InternalRequestController {
         log.debug("Метод findAllByIdIn(); requestIds={}", requestIds);
 
         return requestService.findAllByIdIn(requestIds);
+    }
+
+    @PatchMapping("/user/status/{status}")
+    void updateRequestStatus(@PathVariable RequestStatus status, @RequestParam Set<Long> ids) {
+//        log.debug("Метод updateRequestStatus(); ={}", updRequestsStatus);
+
+        requestService.updateRequestStatus(status, ids);
     }
 }

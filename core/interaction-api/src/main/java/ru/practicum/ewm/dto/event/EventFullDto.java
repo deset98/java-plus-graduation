@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.dto.category.CategoryDto;
-import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.dto.user.UserShortDto;
+import ru.practicum.ewm.enums.event.EventState;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ public class EventFullDto {
 
     private UserShortDto initiator;
 
-    private LocationDto locationDto;
+    private Location location;
 
     private Boolean paid;
 

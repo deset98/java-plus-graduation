@@ -56,7 +56,7 @@ public class Event {
     private Long initiatorId;
 
     @Embedded
-    private Location location;
+    private LocationEntity locationEntity;
 
     @Column(nullable = false,
             columnDefinition = "boolean default false")

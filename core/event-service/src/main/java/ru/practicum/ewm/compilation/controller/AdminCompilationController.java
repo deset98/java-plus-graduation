@@ -7,15 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.compilation.service.CompilationService;
 import ru.practicum.ewm.dto.compilation.CompilationDto;
 import ru.practicum.ewm.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.dto.compilation.UpdateCompilationDto;
-import ru.practicum.ewm.compilation.service.CompilationService;
 
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("admin/compilations")
+@RequestMapping("/admin/compilations")
 @RequiredArgsConstructor
 public class AdminCompilationController {
 

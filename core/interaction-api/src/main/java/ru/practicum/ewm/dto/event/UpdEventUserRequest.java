@@ -29,7 +29,7 @@ public class UpdEventUserRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    private LocationDto locationDto;
+    private Location location;
 
     private Boolean paid;
 
@@ -43,5 +43,5 @@ public class UpdEventUserRequest {
     @Size(min = 3, max = 120)
     private String title;
 
-    public enum StateAction { SEND_TO_REVIEW, CANCEL_REVIEW }
+    public enum StateAction {SEND_TO_REVIEW, CANCEL_REVIEW}
 }

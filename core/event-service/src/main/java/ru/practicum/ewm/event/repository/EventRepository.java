@@ -30,6 +30,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
     boolean existsByIdAndInitiatorId(Long eventId, Long userId);
 
     @Modifying
-    @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests + 1 WHERE e.id = :id")
+    @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests + 1 WHERE e.id = :eventId")
     void incrementConfirmedRequests(Long eventId);
 }

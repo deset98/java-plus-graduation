@@ -35,6 +35,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.time.ZoneOffset.UTC;
 import static ru.practicum.ewm.enums.event.EventState.CANCELED;
@@ -66,7 +68,7 @@ public class EventServiceImpl implements EventService {
         Category category = this.findCategoryBy(newDto.getCategory());
 
         Event event = eventMapper.toEntity(newDto);
-        event.setLocation(locationMapper.toEntity(newDto.getLocationDto()));
+        event.setLocationEntity(locationMapper.toEntity(newDto.getLocation()));
         event.setInitiatorId(userId);
         event.setCategory(category);
         event = eventRepository.save(event);
@@ -149,7 +151,6 @@ public class EventServiceImpl implements EventService {
     public UpdRequestsStatusResult updateRequests(Long userId, Long eventId, EventRequestStatusUpdateRequest updDto) {
         log.debug("Метод updateRequests(), userId={}, eventId={}", userId, eventId);
 
-
         Event event = this.findEventBy(eventId);
         List<ParticipationRequestDto> requests = requestClient.findAllByIdIn(updDto.getRequestIds());
 
@@ -180,14 +181,22 @@ public class EventServiceImpl implements EventService {
                         ? List.of()
                         : requests.subList(availableSlots, requests.size());
 
-//                List<ParticipationRequestDto> confirmedDtos = processRequests(toConfirm, RequestStatus.CONFIRMED);
-//                List<ParticipationRequestDto> rejectedDtos = processRequests(toReject, RequestStatus.REJECTED);
-
                 toConfirm.forEach(requestDto -> requestDto.setStatus(RequestStatus.CONFIRMED));
                 toReject.forEach(requestDto -> requestDto.setStatus(RequestStatus.REJECTED));
 
                 event.setConfirmedRequests(event.getConfirmedRequests() + toConfirm.size());
                 eventRepository.save(event);
+
+                Set<Long> confirmedIds = toConfirm.stream()
+                        .map(ParticipationRequestDto::getId)
+                        .collect(Collectors.toSet());
+
+                Set<Long> rejectedIds = toReject.stream()
+                        .map(ParticipationRequestDto::getId)
+                        .collect(Collectors.toSet());
+
+                requestClient.updateRequestStatus(RequestStatus.CONFIRMED, confirmedIds);
+                requestClient.updateRequestStatus(RequestStatus.REJECTED, rejectedIds);
 
                 result = UpdRequestsStatusResult.builder()
                         .confirmedRequests(toConfirm)
@@ -196,12 +205,14 @@ public class EventServiceImpl implements EventService {
             }
 
             case UpdRequestStatus.REJECTED -> {
-                requests.forEach(request -> {
-                    if (request.getStatus() == RequestStatus.CONFIRMED) {
-                        throw new ConflictException("Нельзя отклонить подтвержденный Request");
-                    }
-                    request.setStatus(RequestStatus.REJECTED);
-                });
+                boolean hasConfirmed = requests.stream().anyMatch(r -> r.getStatus() == RequestStatus.CONFIRMED);
+
+                if (hasConfirmed) {
+                    throw new ConflictException("Нельзя отклонить подтвержденный Request");
+                }
+
+                requests.forEach(r -> r.setStatus(RequestStatus.REJECTED));
+                requestClient.updateRequestStatus(RequestStatus.REJECTED, updDto.getRequestIds());
 
                 result = UpdRequestsStatusResult.builder()
                         .confirmedRequests(List.of())
@@ -402,13 +413,6 @@ public class EventServiceImpl implements EventService {
     public void incrementConfirmedRequests(Long eventId) {
         eventRepository.incrementConfirmedRequests(eventId);
     }
-
-//    private List<ParticipationRequestDto> processRequests(List<ParticipationRequestDto> requests,
-//                                                          RequestStatus status) {
-//        return requests.stream()
-//                .peek(r -> r.setStatus(status))
-//                .toList();
-//    }
 
     private Category findCategoryBy(Long categoryId) {
         log.debug("Поиск Category id={} в репозитории", categoryId);
