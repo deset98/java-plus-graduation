@@ -6,10 +6,10 @@ spring:
     gateway:
       discovery.locator.enabled: true
       routes:
-        - id: main_service
-          uri: lb://main-service
+        - id: user-service
+          uri: lb://user-service
           predicates:
-            - Path=/**
+            - Path=/admin/users/**
 
 management:
   endpoints:
@@ -19,10 +19,14 @@ management:
   endpoint:
     gateway:
       enable: true
+    health:
+      show-details: always
 
 logging:
   level:
     ru.practicum.ewm: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
 
 eureka:
   client:
