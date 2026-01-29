@@ -23,6 +23,7 @@ public interface CommentMapper {
     Comment toEntity(NewCommentDto newDto);
 
     @Mapping(target = "publishedOn", expression = "java(toLocalDateTime(comment.getPublishedOn()))")
+    @Mapping(target = "eventId", ignore = true)
     CommentFullDto toFullDto(Comment comment);
 
     @Mapping(target = "authorName", ignore = true)

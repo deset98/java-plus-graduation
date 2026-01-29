@@ -32,4 +32,4 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./infra/postgres:/docker-entrypoint-initdb.d
+      - ./postgres:/docker-entrypoint-initdb.d
