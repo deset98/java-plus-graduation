@@ -7,7 +7,7 @@ import ru.practicum.ewm.enums.request.RequestStatus;
 import java.time.Instant;
 
 @Entity
-@Table(name = "requests", schema = "requests_schema")
+@Table(name = "requests")
 @Getter
 @Setter
 @Builder
