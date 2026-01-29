@@ -1,4 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS events_schema;
-CREATE SCHEMA IF NOT EXISTS users_schema;
-CREATE SCHEMA IF NOT EXISTS requests_schema;
-CREATE SCHEMA IF NOT EXISTS hits_schema;
+CREATE DATABASE "event-db";
+CREATE DATABASE "stats-db";
+CREATE DATABASE "user-db";
+CREATE DATABASE "request-db";

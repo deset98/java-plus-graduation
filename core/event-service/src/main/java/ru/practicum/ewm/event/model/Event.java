@@ -8,7 +8,7 @@ import ru.practicum.ewm.enums.event.EventState;
 import java.time.Instant;
 
 @Entity
-@Table(name = "events", schema = "events_schema")
+@Table(name = "events")
 @Getter
 @Setter
 @Builder

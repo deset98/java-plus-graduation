@@ -3,9 +3,10 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/main-db?currentSchema=users_schema
+    url: jdbc:postgresql://localhost:5432/user-db
     username: postgres
-    password: postgres
+    password: "postgres"
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     properties:

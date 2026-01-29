@@ -8,7 +8,7 @@ import ru.practicum.ewm.event.model.Event;
 import java.time.Instant;
 
 @Entity
-@Table(name = "comments", schema = "events_schema")
+@Table(name = "comments")
 @Getter
 @Setter
 @Builder
