@@ -14,13 +14,13 @@ on:
           - ANALYZE
       verbose_mode:
         description: "Включить подробные логи во время тестов"
-        required: false
-        default: false
+        required: true
+        default: true
         type: boolean
       print_logs:
         description: "Включить вывод логов в консоль"
-        required: false
-        default: false
+        required: true
+        default: true
         type: boolean
   pull_request:
 
