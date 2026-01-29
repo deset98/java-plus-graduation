@@ -27,6 +27,7 @@ logging:
     ru.practicum.ewm: DEBUG
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.gateway.route: DEBUG
+    root: DEBUG
 
 eureka:
   client:
