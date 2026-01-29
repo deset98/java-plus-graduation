@@ -32,9 +32,9 @@ public class InternalRequestController {
         return requestService.findAllByIdIn(requestIds);
     }
 
-    @PatchMapping("/user/status/{status}")
+    @PostMapping("/user/status/{status}")
     void updateRequestStatus(@PathVariable RequestStatus status, @RequestParam Set<Long> ids) {
-//        log.debug("Метод updateRequestStatus(); ={}", updRequestsStatus);
+        log.debug("Метод updateRequestStatus(); status={}, ids={}", status, ids);
 
         requestService.updateRequestStatus(status, ids);
     }

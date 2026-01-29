@@ -34,7 +34,7 @@ public class InternalEventController {
         return eventService.existsByIdAndInitiatorId(eventId, userId);
     }
 
-    @PatchMapping("/{eventId}")
+    @PostMapping("/{eventId}")
     public void incrementConfirmedRequests(@PathVariable Long eventId) {
         log.debug("InternalEventController, метод incrementConfirmedRequests(); eventId={}", eventId);
 

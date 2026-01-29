@@ -1,19 +1,4 @@
 services:
-#  stats-server:
-#    profiles: [app]
-#    build: stats/stats-server
-#    image: stats-server
-#    container_name: stats-server
-#    ports:
-#      - "9090:9090"
-#    depends_on:
-#      stats-db:
-#        condition: service_healthy
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats-db
-#      - SPRING_DATASOURCE_USERNAME=postgres
-#      - SPRING_DATASOURCE_PASSWORD=postgres
-#
 
   stats-db:
     profiles: [db]
@@ -30,57 +15,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-#
-#  #----  ----  ----  ----  ---- ----  ----  ----  ----  ----
-#
-#  event-service:
-#    profiles: [app]
-#    build: event-service
-#    image: event-service
-#    container_name: event-service
-#    ports:
-#      - "8081:8081"
-#    depends_on:
-#      main-db:
-#        condition: service_healthy
-#      stats-server:
-#        condition: service_started
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=events_schema
-#      - SPRING_DATASOURCE_USERNAME=postgres
-#      - SPRING_DATASOURCE_PASSWORD=postgres
-#      - STATS_SERVER_URL=http://stats-server:9090
-#
-#  user-service:
-#    profiles: [app]
-#    build: user-service
-#    image: user-service
-#    container_name: user-service
-#    ports:
-#      - "8091:8091"
-#    depends_on:
-#      main-db:
-#        condition: service_healthy
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=users_schema
-#      - SPRING_DATASOURCE_USERNAME=postgres
-#      - SPRING_DATASOURCE_PASSWORD=postgres
-#
-#  request-service:
-#    profiles: [app]
-#    build: request-service
-#    image: request-service
-#    container_name: request-service
-#    ports:
-#      - "8092:8092"
-#    depends_on:
-#      main-db:
-#        condition: service_healthy
-#    environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/main-db?currentSchema=requests_schema
-#      - SPRING_DATASOURCE_USERNAME=postgres
-#      - SPRING_DATASOURCE_PASSWORD=postgres
-#
+
   main-db:
     profiles: [db]
     image: postgres:16.1
