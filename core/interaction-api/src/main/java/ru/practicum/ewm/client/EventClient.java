@@ -15,5 +15,5 @@ public interface EventClient {
                                      @RequestParam Long userId);
 
     @PostMapping("/{eventId}")
-    void incrementConfirmedRequests(@PathVariable Long eventId);
+    void incrementConfirmedRequestsForEvent(@PathVariable Long eventId);
 }
