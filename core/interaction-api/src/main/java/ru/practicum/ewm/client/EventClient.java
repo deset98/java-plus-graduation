@@ -1,0 +1,19 @@
+package ru.practicum.ewm.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewm.dto.event.EventFullDto;
+
+@FeignClient(name = "event-service", path = "/internal/events")
+public interface EventClient {
+
+    @GetMapping("/{eventId}")
+    EventFullDto getEventBy(@PathVariable Long eventId);
+
+    @GetMapping("/check")
+    boolean existsByIdAndInitiatorId(@RequestParam Long eventId,
+                                     @RequestParam Long userId);
+
+    @PostMapping("/{eventId}")
+    void incrementConfirmedRequestsForEvent(@PathVariable Long eventId);
+}

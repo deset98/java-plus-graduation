@@ -1,0 +1,24 @@
+package ru.practicum.ewm.dto.event;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.ewm.enums.event.UpdRequestStatus;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventRequestStatusUpdateRequest {
+
+    @Builder.Default
+    private Set<Long> requestIds = new HashSet<>();
+
+    @NotNull
+    private UpdRequestStatus status;
+}
