@@ -16,7 +16,7 @@
         <module>core</module>
         <module>infra</module>
         <module>stats/collector</module>
-        <module>stats/analizer</module>
+        <module>stats/analyzer</module>
         <module>stats/aggregator</module>
     </modules>
 

@@ -22,17 +22,17 @@ public class PublicEventController {
     private final EventService eventService;
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventFullDto> publicSearchOne(@PathVariable @Positive Long eventId,
-                                                        HttpServletRequest request) {
+    public ResponseEntity<EventFullDto> getEvent(@PathVariable @Positive Long eventId,
+                                                 @RequestHeader("X-EWM-USER-ID") Long userId) {
         log.debug("Метод publicSearchOne(); eventId={}", eventId);
 
-        EventFullDto event = eventService.getEventBy(eventId, request);
+        EventFullDto event = eventService.getEventBy(eventId, userId);
         return ResponseEntity.ok(event);
     }
 
     @GetMapping
-    public ResponseEntity<List<EventFullDto>> publicSearchMany(@Valid @ModelAttribute UserEventSearchParams params,
-                                                               HttpServletRequest request) {
+    public ResponseEntity<List<EventFullDto>> getListOfEvents(@Valid @ModelAttribute UserEventSearchParams params,
+                                                              HttpServletRequest request) {
         log.debug("Метод publicSearchMany(); {}", params);
 
         List<EventFullDto> events = eventService.getListOfEventsBy(params, request);

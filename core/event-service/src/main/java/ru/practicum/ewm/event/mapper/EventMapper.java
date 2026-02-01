@@ -27,11 +27,12 @@ public interface EventMapper {
     @Mapping(target = "requestModeration",
             expression = "java(newEventDto.getRequestModeration() != null ? newEventDto.getRequestModeration() : true)")
     @Mapping(target = "state", ignore = true)
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     Event toEntity(NewEventDto newEventDto);
 
     @Mapping(target = "initiator", ignore = true)
     @Mapping(target = "eventDate", expression = "java(toLocalDateTimeForMap(event.getEventDate()))")
+    @Mapping(target = "rating", ignore = true)
     EventShortDto toShortDto(Event event);
 
     @Mapping(target = "initiator", ignore = true)
@@ -39,6 +40,7 @@ public interface EventMapper {
     @Mapping(target = "createdOn", expression = "java(toLocalDateTimeForMap(event.getCreatedOn()))")
     @Mapping(target = "eventDate", expression = "java(toLocalDateTimeForMap(event.getEventDate()))")
     @Mapping(target = "publishedOn", expression = "java(toLocalDateTimeForMap(event.getPublishedOn()))")
+    @Mapping(target = "rating", ignore = true)
     EventFullDto toFullDto(Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -51,8 +53,8 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "state", ignore = true)
-    @Mapping(target = "views", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     void updateFromDto(UpdEventUserRequest updEventUserRequest, @MappingTarget Event event);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -65,7 +67,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "state", ignore = true)
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     void updateFromDto(UpdEventAdminRequest updEventAdminRequest, @MappingTarget Event event);
 

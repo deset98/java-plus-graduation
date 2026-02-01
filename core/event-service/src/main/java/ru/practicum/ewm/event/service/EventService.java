@@ -23,7 +23,7 @@ public interface EventService {
     List<EventFullDto> searchForAdmin(AdminEventSearchParams params);
 
     // Public API:
-    EventFullDto getEventBy(Long eventId, HttpServletRequest request);
+    EventFullDto getEventBy(Long eventId, Long userId);
 
     List<EventFullDto> getListOfEventsBy(UserEventSearchParams params, HttpServletRequest request);
 
