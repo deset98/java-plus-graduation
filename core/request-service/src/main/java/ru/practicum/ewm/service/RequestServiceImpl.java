@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.ewm.client.EventClient;
+import ru.practicum.ewm.client.GrpcCollectorClient;
 import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.dto.event.EventFullDto;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
@@ -17,6 +18,8 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.repository.RequestRepository;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.UserActionProto;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +35,8 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
 
     private final RequestMapper requestMapper;
+
+    private final GrpcCollectorClient grpcCollectorClient;
 
     @Override
     @Transactional
@@ -76,6 +81,15 @@ public class RequestServiceImpl implements RequestService {
                 .build();
         request = requestRepository.save(request);
 
+
+        UserActionProto actionProto =
+                UserActionProto.newBuilder()
+                        .setUserId(userId)
+                        .setEventId(eventId)
+                        .setActionType(ActionTypeProto.ACTION_REGISTER)
+                        .build();
+
+        grpcCollectorClient.collectUserAction(actionProto);
         return requestMapper.toDto(request);
     }
 
