@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.client.GrpcAnalyzerClient;
 import ru.practicum.ewm.client.GrpcCollectorClient;
 import ru.practicum.ewm.client.RequestClient;
 import ru.practicum.ewm.client.UserClient;
@@ -26,15 +27,19 @@ import ru.practicum.ewm.event.mapper.LocationMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.QEvent;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.ewm.stats.proto.UserActionProto;
+import ru.practicum.ewm.stats.proto.UserPredictionsRequestProto;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,6 +61,7 @@ public class EventServiceImpl implements EventService {
     private final LocationMapper locationMapper;
 
     private final GrpcCollectorClient grpcCollectorClient;
+    private final GrpcAnalyzerClient grpcAnalyzerClient;
 
     // Private API:
     @Override
@@ -325,11 +331,6 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованного Event id={} нет", eventId));
 
-                /*
- todo ...
-        statsClient.hit(request);
-*/
-
         grpcCollectorClient.collectUserAction(
                 UserActionProto.newBuilder()
                         .setEventId(eventId)
@@ -404,8 +405,55 @@ public class EventServiceImpl implements EventService {
         return events.map(eventMapper::toFullDto).getContent();
     }
 
-    // Internal API:
+    @Override
+    public List<EventShortDto> getRecommendations(Long userId, int size) {
 
+        UserPredictionsRequestProto requestProto =
+                UserPredictionsRequestProto.newBuilder()
+                        .setUserId(userId)
+                        .setMaxResults(20)
+                        .setMaxResults(size)
+                        .build();
+
+        List<RecommendedEventProto> events = grpcAnalyzerClient.getRecommendationsForUser(requestProto).toList();
+
+        Map<Long, Double> scoreByEvent =
+                events.stream()
+                        .collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
+        Set<Long> ids =
+                events.stream()
+                        .map(RecommendedEventProto::getEventId)
+                        .collect(Collectors.toSet());
+
+        return eventRepository.findAllByIdIn(ids).stream()
+                .map(eventMapper::toShortDto)
+                .peek(dto -> dto.setRating(scoreByEvent.get(dto.getId())))
+                .toList();
+    }
+
+    @Override
+    public void like(Long userId, Long eventId) {
+        if (!requestClient.isParticipant(userId, eventId)) {
+            throw new BadRequestException("User id={} не является участником event eventId={}", userId, eventId);
+        }
+
+        if (!eventRepository.eventDateIsBefore(eventId, LocalDateTime.now())) {
+            throw new BadRequestException("Event eventId={} еще не прошло", eventId);
+        }
+
+        UserActionProto actionProto =
+                UserActionProto.newBuilder()
+                        .setEventId(eventId)
+                        .setUserId(userId)
+                        .setActionType(ActionTypeProto.ACTION_LIKE)
+                        .build();
+
+        grpcCollectorClient.collectUserAction(actionProto);
+    }
+
+
+    // Internal API:
     @Override
     public EventFullDto getEventBy(Long eventId) {
         return eventMapper.toFullDto(this.findEventBy(eventId));

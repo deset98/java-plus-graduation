@@ -110,7 +110,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private List<Event> findEventsBy(Set<Long> eventsIds) {
-        List<Event> events = eventRepository.findEventsByIdIn(eventsIds);
+        List<Event> events = eventRepository.findAllByIdIn(eventsIds);
 
         if (events.size() != eventsIds.size()) {
             throw new NotFoundException("Некоторые события не найдены");

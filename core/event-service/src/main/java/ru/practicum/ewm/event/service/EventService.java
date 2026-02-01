@@ -31,6 +31,11 @@ public interface EventService {
 
     UpdRequestsStatusResult updateRequests(Long userId, Long eventId, EventRequestStatusUpdateRequest updDto);
 
+
+    List<EventShortDto> getRecommendations(Long userId, int size);
+
+    void like(Long eventId, Long userId);
+
     // Internal API:
     EventFullDto getEventBy(Long eventId);
 

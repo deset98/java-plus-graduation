@@ -137,6 +137,12 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
+    @Override
+    public boolean isParticipant(Long userId, Long eventId) {
+        return requestRepository.existsByEventIdAndRequesterId(userId, eventId);
+    }
+
+
     private Request findRequestBy(Long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Request id={} не найден", requestId));
