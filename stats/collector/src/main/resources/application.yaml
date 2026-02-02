@@ -16,3 +16,8 @@ spring:
       discovery:
         enabled: true
         serviceId: config-server
+
+eureka:
+  instance:
+    metadata-map:
+      grpc-port: "${grpc.server.port}"
