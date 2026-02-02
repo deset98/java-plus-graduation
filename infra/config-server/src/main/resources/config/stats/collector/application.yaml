@@ -14,7 +14,7 @@ kafka-collector:
       bootstrap.servers: "localhost:9092"
       group.id: "stats-collector-producer-v1"
       key.serializer: "org.apache.kafka.common.serialization.VoidSerializer"
-      value.serializer: "ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer"
+      value.serializer: "ru.practicum.kafka.serializer.GeneralAvroSerializer"
 
 management:
   endpoints:

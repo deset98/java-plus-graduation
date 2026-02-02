@@ -7,7 +7,6 @@
         <groupId>ru.practicum</groupId>
         <artifactId>stats</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>collector</artifactId>
@@ -28,12 +27,12 @@
             <artifactId>avro-schemas</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>ru.practicum</groupId>
             <artifactId>proto-schemas</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -59,6 +58,10 @@
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
             <version>${grpc-server-spring-boot-starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
@@ -89,11 +92,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -117,5 +115,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

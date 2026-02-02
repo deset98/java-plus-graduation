@@ -15,9 +15,6 @@
         <module>stats</module>
         <module>core</module>
         <module>infra</module>
-        <module>stats/collector</module>
-        <module>stats/analyzer</module>
-        <module>stats/aggregator</module>
     </modules>
 
     <groupId>ru.practicum</groupId>
