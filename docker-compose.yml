@@ -2,6 +2,7 @@ services:
 
   kafka:
     image: confluentinc/confluent-local:7.4.3
+    container_name: kafka
     hostname: kafka
     ports:
       - "9092:9092"
@@ -20,7 +21,8 @@ services:
   kafka-init-topics:
     image: confluentinc/confluent-local:7.4.3
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
     command: "bash -c \
                   'kafka-topics --create --topic stats.user-actions.v1 \
                                --partitions 1 --replication-factor 1 --if-not-exists \
@@ -30,28 +32,12 @@ services:
                                --bootstrap-server kafka:29092'"
     init: true
 
-  stats-db:
+  postgres:
     image: postgres:16.1
-    container_name: stats-db
-    ports:
-      - "6432:5432"
-    environment:
-      - POSTGRES_DB=stats-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  main-db:
-    image: postgres:16.1
-    container_name: main-db
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: main-db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:

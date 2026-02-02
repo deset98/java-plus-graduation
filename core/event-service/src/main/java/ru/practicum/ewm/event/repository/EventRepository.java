@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.event.model.Event;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -34,5 +35,5 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
     @Query("UPDATE Event e SET e.confirmedRequests = e.confirmedRequests + 1 WHERE e.id = :eventId")
     void incrementConfirmedRequests(Long eventId);
 
-    boolean eventDateIsBefore(Long eventId, LocalDateTime date);
+    boolean existsByIdAndEventDateBefore(Long eventId, Instant date);
 }

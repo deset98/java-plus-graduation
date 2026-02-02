@@ -19,6 +19,7 @@ import ru.practicum.ewm.client.RequestClient;
 import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.dto.user.UserShortDto;
 import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.enums.event.UpdRequestStatus;
 import ru.practicum.ewm.enums.request.RequestStatus;
@@ -317,9 +318,25 @@ public class EventServiceImpl implements EventService {
         int page = params.getFrom() / params.getSize();
         Pageable pageable = PageRequest.of(page, params.getSize());
 
-        Page<Event> events = eventRepository.findAll(finalCondition, pageable);
 
-        return events.map(eventMapper::toFullDto).getContent();
+        Page<Event> eventsPage = eventRepository.findAll(finalCondition, pageable);
+
+        List<Long> initiatorIds = eventsPage.stream()
+                .map(Event::getInitiatorId)
+                .toList();
+
+        Map<Long, UserShortDto> usersMap = userClient.getUsersBy(initiatorIds)
+                .stream().collect(Collectors.toMap(UserShortDto::getId, u -> u));
+
+        List<EventFullDto> dtos = eventsPage.stream()
+                .map(e -> {
+                    EventFullDto dto = eventMapper.toFullDto(e);
+                    dto.setInitiator(usersMap.get(e.getInitiatorId()));
+                    return dto;
+                })
+                .toList();
+
+        return dtos;
     }
 
 
@@ -331,13 +348,12 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованного Event id={} нет", eventId));
 
-        grpcCollectorClient.collectUserAction(
-                UserActionProto.newBuilder()
-                        .setEventId(eventId)
-                        .setUserId(userId)
-                        .setActionType(ActionTypeProto.ACTION_VIEW)
-                        .build()
-        );
+//        grpcCollectorClient.collectUserAction(
+//                UserActionProto.newBuilder()
+//                        .setEventId(eventId)
+//                        .setUserId(userId)
+//                        .setActionType(ActionTypeProto.ACTION_VIEW)
+//                        .build());
 
         return eventMapper.toFullDto(event);
     }
@@ -438,7 +454,7 @@ public class EventServiceImpl implements EventService {
             throw new BadRequestException("User id={} не является участником event eventId={}", userId, eventId);
         }
 
-        if (!eventRepository.eventDateIsBefore(eventId, LocalDateTime.now())) {
+        if (!eventRepository.existsByIdAndEventDateBefore(eventId, Instant.now())) {
             throw new BadRequestException("Event eventId={} еще не прошло", eventId);
         }
 

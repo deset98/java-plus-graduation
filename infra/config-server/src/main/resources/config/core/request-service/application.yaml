@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/request-db
     username: postgres
-    password: "postgres"
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -27,11 +27,12 @@ logging:
 
 grpc:
   client:
-  collector:
-    address: 'discovery:///collector'
-    enableKeepAlive: true
-    keepAliveWithoutCalls: true
-    negotiationType: plaintext
+    collector:
+      address: 'discovery:///collector'
+      negotiationType: plaintext
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+
 
 eureka:
   instance:

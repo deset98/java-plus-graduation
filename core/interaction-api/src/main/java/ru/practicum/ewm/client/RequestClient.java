@@ -20,11 +20,9 @@ public interface RequestClient {
     @GetMapping("/list")
     List<ParticipationRequestDto> findAllByIdIn(@RequestParam Set<Long> requestIds);
 
-    @GetMapping
-
     @PostMapping("/user/status/{status}")
     void updateRequestStatus(@PathVariable RequestStatus status, @RequestParam Set<Long> ids);
 
-    @PostMapping("{eventId}/participant/{userId}")
+    @GetMapping("{eventId}/participant/{userId}")
     boolean isParticipant(@PathVariable Long userId, @PathVariable Long eventId);
 }
