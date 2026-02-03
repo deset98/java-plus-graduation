@@ -348,12 +348,12 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованного Event id={} нет", eventId));
 
-//        grpcCollectorClient.collectUserAction(
-//                UserActionProto.newBuilder()
-//                        .setEventId(eventId)
-//                        .setUserId(userId)
-//                        .setActionType(ActionTypeProto.ACTION_VIEW)
-//                        .build());
+        grpcCollectorClient.collectUserAction(
+                UserActionProto.newBuilder()
+                        .setEventId(eventId)
+                        .setUserId(userId)
+                        .setActionType(ActionTypeProto.ACTION_VIEW)
+                        .build());
 
         return eventMapper.toFullDto(event);
     }

@@ -24,6 +24,7 @@ public class UserActionController extends UserActionControllerGrpc.UserActionCon
 
     @Override
     public void collectUserAction(UserActionProto request, StreamObserver<Empty> responseObserver) {
+        log.debug("Метод Collect user action();");
         try {
             userActionHandler.handle(userActionTopic, request);
             responseObserver.onNext(Empty.getDefaultInstance());

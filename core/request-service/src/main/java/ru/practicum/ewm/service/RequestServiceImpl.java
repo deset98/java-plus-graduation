@@ -18,6 +18,8 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.mapper.RequestMapper;
 import ru.practicum.ewm.model.Request;
 import ru.practicum.ewm.repository.RequestRepository;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.UserActionProto;
 
 import java.util.List;
 import java.util.Set;
@@ -81,14 +83,14 @@ public class RequestServiceImpl implements RequestService {
         request = requestRepository.save(request);
 
 
-//        UserActionProto actionProto =
-//                UserActionProto.newBuilder()
-//                        .setUserId(userId)
-//                        .setEventId(eventId)
-//                        .setActionType(ActionTypeProto.ACTION_REGISTER)
-//                        .build();
-//
-//        grpcCollectorClient.collectUserAction(actionProto);
+        UserActionProto actionProto =
+                UserActionProto.newBuilder()
+                        .setUserId(userId)
+                        .setEventId(eventId)
+                        .setActionType(ActionTypeProto.ACTION_REGISTER)
+                        .build();
+
+        grpcCollectorClient.collectUserAction(actionProto);
         return requestMapper.toDto(request);
     }
 
