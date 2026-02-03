@@ -18,6 +18,9 @@ spring:
         serviceId: config-server
 
 eureka:
-  instance:
-    metadata-map:
-      grpc-port: "${grpc.server.port}"
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+#  instance:
+#    metadata-map:
+#      grpc-port: ${grpc.server.port}
