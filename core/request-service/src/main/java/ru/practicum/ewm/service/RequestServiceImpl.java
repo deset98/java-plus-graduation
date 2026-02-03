@@ -69,9 +69,7 @@ public class RequestServiceImpl implements RequestService {
                 (!eventDto.getRequestModeration() || limit == 0) ? RequestStatus.CONFIRMED : RequestStatus.PENDING;
 
         if (status == RequestStatus.CONFIRMED) {
-//            eventDto.setConfirmedRequests(eventDto.getConfirmedRequests() + 1);
-//            eventClient.updateEvent(eventDto.getId(), eventDto);
-            eventClient.incrementConfirmedRequests(eventDto.getId());
+            eventClient.incrementConfirmedRequestsForEvent(eventId);
         }
 
         Request request = Request.builder()
