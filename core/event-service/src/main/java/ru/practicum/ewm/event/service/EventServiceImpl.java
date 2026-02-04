@@ -11,15 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.ReqStatsParams;
-import ru.practicum.ewm.StatsDto;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
+import ru.practicum.ewm.client.GrpcAnalyzerClient;
+import ru.practicum.ewm.client.GrpcCollectorClient;
 import ru.practicum.ewm.client.RequestClient;
-import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.client.UserClient;
 import ru.practicum.ewm.dto.event.*;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
+import ru.practicum.ewm.dto.user.UserShortDto;
 import ru.practicum.ewm.enums.event.EventState;
 import ru.practicum.ewm.enums.event.UpdRequestStatus;
 import ru.practicum.ewm.enums.request.RequestStatus;
@@ -28,13 +28,19 @@ import ru.practicum.ewm.event.mapper.LocationMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.QEvent;
 import ru.practicum.ewm.event.repository.EventRepository;
+import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.ConflictException;
 import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
+import ru.practicum.ewm.stats.proto.RecommendedEventProto;
+import ru.practicum.ewm.stats.proto.UserActionProto;
+import ru.practicum.ewm.stats.proto.UserPredictionsRequestProto;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,7 +61,8 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final LocationMapper locationMapper;
 
-    private final StatsClient statsClient;
+    private final GrpcCollectorClient grpcCollectorClient;
+    private final GrpcAnalyzerClient grpcAnalyzerClient;
 
     // Private API:
     @Override
@@ -311,22 +318,42 @@ public class EventServiceImpl implements EventService {
         int page = params.getFrom() / params.getSize();
         Pageable pageable = PageRequest.of(page, params.getSize());
 
-        Page<Event> events = eventRepository.findAll(finalCondition, pageable);
 
-        return events.map(eventMapper::toFullDto).getContent();
+        Page<Event> eventsPage = eventRepository.findAll(finalCondition, pageable);
+
+        List<Long> initiatorIds = eventsPage.stream()
+                .map(Event::getInitiatorId)
+                .toList();
+
+        Map<Long, UserShortDto> usersMap = userClient.getUsersBy(initiatorIds)
+                .stream().collect(Collectors.toMap(UserShortDto::getId, u -> u));
+
+        List<EventFullDto> dtos = eventsPage.stream()
+                .map(e -> {
+                    EventFullDto dto = eventMapper.toFullDto(e);
+                    dto.setInitiator(usersMap.get(e.getInitiatorId()));
+                    return dto;
+                })
+                .toList();
+
+        return dtos;
     }
 
 
     // Public API:
     @Override
-    public EventFullDto getEventBy(Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventBy(Long eventId, Long userId) {
         log.debug("Метод getPublicById(); eventId={}", eventId);
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Опубликованного Event id={} нет", eventId));
 
-        statsClient.hit(request);
-        this.setViewsForEvent(event);
+        grpcCollectorClient.collectUserAction(
+                UserActionProto.newBuilder()
+                        .setEventId(eventId)
+                        .setUserId(userId)
+                        .setActionType(ActionTypeProto.ACTION_VIEW)
+                        .build());
 
         return eventMapper.toFullDto(event);
     }
@@ -385,19 +412,64 @@ public class EventServiceImpl implements EventService {
         switch (params.getSort()) {
             case EVENT_DATE -> pageable =
                     PageRequest.of(page, params.getSize(), Sort.by(Sort.Direction.ASC, "eventDate"));
-            case VIEWS -> pageable =
+            case RATING -> pageable =
                     PageRequest.of(page, params.getSize(), Sort.by(Sort.Direction.DESC, "views"));
         }
 
         Page<Event> events = eventRepository.findAll(finalCondition, pageable);
 
-        statsClient.hit(request);
-
         return events.map(eventMapper::toFullDto).getContent();
     }
 
-    // Internal API:
+    @Override
+    public List<EventShortDto> getRecommendations(Long userId, int size) {
 
+        UserPredictionsRequestProto requestProto =
+                UserPredictionsRequestProto.newBuilder()
+                        .setUserId(userId)
+                        .setMaxResults(20)
+                        .setMaxResults(size)
+                        .build();
+
+        List<RecommendedEventProto> events = grpcAnalyzerClient.getRecommendationsForUser(requestProto).toList();
+
+        Map<Long, Double> scoreByEvent =
+                events.stream()
+                        .collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
+        Set<Long> ids =
+                events.stream()
+                        .map(RecommendedEventProto::getEventId)
+                        .collect(Collectors.toSet());
+
+        return eventRepository.findAllByIdIn(ids).stream()
+                .map(eventMapper::toShortDto)
+                .peek(dto -> dto.setRating(scoreByEvent.get(dto.getId())))
+                .toList();
+    }
+
+    @Override
+    public void like(Long userId, Long eventId) {
+        if (!requestClient.isParticipant(userId, eventId)) {
+            throw new BadRequestException("User id={} не является участником event eventId={}", userId, eventId);
+        }
+
+        if (!eventRepository.existsByIdAndEventDateBefore(eventId, Instant.now())) {
+            throw new BadRequestException("Event eventId={} еще не прошло", eventId);
+        }
+
+        UserActionProto actionProto =
+                UserActionProto.newBuilder()
+                        .setEventId(eventId)
+                        .setUserId(userId)
+                        .setActionType(ActionTypeProto.ACTION_LIKE)
+                        .build();
+
+        grpcCollectorClient.collectUserAction(actionProto);
+    }
+
+
+    // Internal API:
     @Override
     public EventFullDto getEventBy(Long eventId) {
         return eventMapper.toFullDto(this.findEventBy(eventId));
@@ -450,16 +522,5 @@ public class EventServiceImpl implements EventService {
         if (eventDate != null && eventDate.isBefore(LocalDateTime.now().plusHours(1))) {
             throw new ConflictException("Дата Event при ПУБЛИКАЦИИ должна быть в будущем, мин. через 1 час");
         }
-    }
-
-    private void setViewsForEvent(Event event) {
-        List<StatsDto> stats = statsClient.getStats(ReqStatsParams.builder()
-                .start(LocalDateTime.now().minusYears(100))
-                .end(LocalDateTime.now().plusYears(1))
-                .uris(List.of("/events/" + event.getId()))
-                .unique(true)
-                .build());
-
-        event.setViews(stats.getFirst().getHits());
     }
 }

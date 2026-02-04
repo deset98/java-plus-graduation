@@ -23,13 +23,18 @@ public interface EventService {
     List<EventFullDto> searchForAdmin(AdminEventSearchParams params);
 
     // Public API:
-    EventFullDto getEventBy(Long eventId, HttpServletRequest request);
+    EventFullDto getEventBy(Long eventId, Long userId);
 
     List<EventFullDto> getListOfEventsBy(UserEventSearchParams params, HttpServletRequest request);
 
     List<ParticipationRequestDto> getEventRequests(Long userId, Long eventId);
 
     UpdRequestsStatusResult updateRequests(Long userId, Long eventId, EventRequestStatusUpdateRequest updDto);
+
+
+    List<EventShortDto> getRecommendations(Long userId, int size);
+
+    void like(Long eventId, Long userId);
 
     // Internal API:
     EventFullDto getEventBy(Long eventId);

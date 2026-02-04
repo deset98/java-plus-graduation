@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/user-db
     username: postgres
-    password: "postgres"
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -24,17 +24,6 @@ spring:
 logging:
   level:
     ru.practicum.ewm: DEBUG
-
-eureka:
-  instance:
-    preferIpAddress: true
-    hostname: localhost
-    instance-id: "${spring.application.name}:${random.value}"
-  client:
-    healthcheck:
-      enabled: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
 
 server:
   port: 0

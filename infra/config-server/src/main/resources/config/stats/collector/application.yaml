@@ -1,0 +1,27 @@
+topics:
+  userActions: "stats.user-actions.v1"
+
+grpc:
+  server:
+    port: 0
+    enableKeepAlive: true
+    keepAliveWithoutCalls: true
+    negotiationType: plaintext
+
+kafka-collector:
+  producer:
+    properties:
+      bootstrap.servers: "localhost:9092"
+      group.id: "stats-collector-producer-v1"
+      key.serializer: "org.apache.kafka.common.serialization.VoidSerializer"
+      value.serializer: "ru.practicum.kafka.serializer.GeneralAvroSerializer"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+logging:
+  level:
+    ru.practicum.ewm.collector: DEBUG

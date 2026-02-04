@@ -21,4 +21,6 @@ public interface RequestService {
     List<ParticipationRequestDto> findAllByIdIn(Set<Long> requestIds);
 
     void updateRequestStatus(@PathVariable RequestStatus status, @RequestParam Set<Long> ids);
+
+    boolean isParticipant(Long userId, Long eventId);
 }
